@@ -12,7 +12,7 @@
     "gen:wards": "python3 tools/gen_wards.py > /tmp/wards.json && echo 'see tools/README.md'"
   },
   "dependencies": {
-    "next": "15.5.4",
+    "next": "15.5.27",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
