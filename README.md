@@ -1,341 +1,436 @@
 # JalDrishti 2030
 
-**A decision-support prototype for neighbourhood water-stress planning in Bengaluru.**
+### An IoT–AI Digital Twin for Predictive Water-Stress and Intervention Planning in Bengaluru
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000?logo=next.js&logoColor=white)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Status](https://img.shields.io/badge/status-frontend%20prototype-E2553B)](#roadmap)
-[![Data](https://img.shields.io/badge/data-partly%20synthetic-8B8F93)](#what-is-real-and-what-is-not)
+> **Research-driven decision support for neighbourhood-scale urban water resilience.**
 
----
+[![Live Demo](https://img.shields.io/badge/Live-Demo-E2553B?style=flat-square)](https://repository-name-jal-drishti-2030-9o.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.27-111111?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Status](https://img.shields.io/badge/Status-Research_Prototype-16323D?style=flat-square)](#current-status)
+[![Data Integrity](https://img.shields.io/badge/Data-Synthetic%2FProvenance--Aware-8B8F93?style=flat-square)](#data-integrity-and-research-honesty)
 
-## What this is
+**Live application:** https://repository-name-jal-drishti-2030-9o.vercel.app  
+**Repository:** https://github.com/Jyatin/Repository-name-JalDrishti-2030  
+**Research manuscript:** *JalDrishti 2030: An IoT–AI Digital Twin for Predictive Water-Stress and Intervention Planning in Bengaluru*  
+**Competition:** III International Competition of Student and Young Researcher Projects — **SMART CITY 2030**, Category 3: Smart-City Technologies and Services  
+**Author:** Jyatin Kumar Singh, B.Tech CSE, Lovely Professional University  
+**Research supervision:** Dr. Parveen Kumar, Mittal School of Business, Lovely Professional University
 
-JalDrishti is a planning layer, not a water management system. It sits *above* a
-utility's existing operational infrastructure and answers a different question:
-not "what is the network doing right now" but "which neighbourhoods will be
-under water stress, and which package of interventions is worth funding?"
-
-This repository is the frontend of that system — a working prototype with the
-analytical layer running in the browser. It can check connectivity to the
-Python/FastAPI backend, whose current API provides health status only. The
-analytical figures remain local prototype fixtures until matching data routes
-and services are implemented.
-
-The project is a software implementation of a research paper,
-*JalDrishti 2030: An IoT–AI Digital Twin for Predictive Water-Stress and
-Intervention Planning in Bengaluru*, submitted to the BRICS **SMART CITY 2030**
-international student research competition.
+> **Paper note:** the manuscript is currently maintained as the competition/research document rather than a public publisher URL. A public PDF link can be added here once an externally accessible copy is available; no unverified URL is intentionally published.
 
 ---
 
-## The problem
+## 1. Overview
 
-Bengaluru's water insecurity is not evenly spread, and a single citywide
-supply-and-demand balance hides that. During the 2024 crisis a large share of
-the city's borewells ran dry, and a groundwater assessment identified dozens of
-wards and peripheral villages at high risk of shortage — while aggregate supply
-capacity was simultaneously being increased. Adding water to the system does not
-automatically reach the neighbourhood that has none.
+**JalDrishti 2030** is a research-backed software prototype for neighbourhood-level water-stress planning in Bengaluru. It explores how an urban water-planning layer can combine heterogeneous data, predictive modelling, representative hydraulic simulation and multi-objective intervention analysis into one traceable decision-support workflow.
 
-The utility is not the obstacle. It runs centralised SCADA, GIS asset
-management, bulk flow measurement and district metered areas. What is missing is
-a layer that turns all of that into forward-looking, spatially targeted,
-equity-aware planning decisions.
+The system is designed around a six-stage planning cycle:
 
-### The finding that shaped this build
+**Sense → Integrate → Predict → Simulate → Optimise → Decide**
 
-The paper's Phase 2 audit went looking for the data such a layer would need, and
-graded each variable against the resolution actually required:
+The project is deliberately positioned as a **planning and decision-support layer**, not an operational water-control system. It does not control utility infrastructure or claim to reproduce Bengaluru's real hydraulic state.
 
-| Grade | Meaning |
-| :---: | --- |
-| **A** | Directly usable ward-level numbers |
-| **B** | Directly usable zone-level numbers |
-| **C** | Spatial data that can reasonably be aggregated to wards |
-| **D** | Categorical evidence only — not a measurement |
-| **E** | Not available at the resolution the model requires |
-
-Ward consumption, non-revenue water and supply reliability all came back at
-**grade E**. Groundwater criticality exists only as a **grade D** categorical
-notification. Rainfall and population reach **grade C**.
-
-So the paper's headline result is a negative one: *the operational data this
-model needs is not publicly published.* That is not an inconvenience to design
-around. It is the finding, and this interface is built to make it visible rather
-than to paper over it.
+The central research contribution is equally important: the paper's Phase 2 data-availability audit found that several variables required for ward-level modelling are **not publicly available at the resolution required**. JalDrishti therefore treats data provenance, uncertainty and synthetic-data disclosure as first-class product requirements rather than hiding the gap behind apparently precise numbers.
 
 ---
 
-## What is real and what is not
+## 2. Research question
 
-This distinction is enforced in the type system, surfaced on every screen, and
-is the single most important thing to understand about the project.
+> **How can a city-scale digital-twin architecture support transparent, predictive and equity-aware water-stress planning when the operational data required for ward-level modelling is incomplete or unavailable?**
 
-| Layer | Status | Notes |
-| --- | --- | --- |
-| Rainfall record (1991–2023) | **Real** | 33 complete years, measured series, grade C |
-| Availability audit | **Real** | The paper's own Phase 2 findings |
-| Intervention mechanisms & cost bands | **Real** | From the paper's intervention library |
-| WSI mathematics | **Real** | Normalisation, entropy weighting, sensitivity |
-| Forecast validation procedure | **Real** | Chronological holdout, MAE/RMSE, baseline gate |
-| Non-dominated sort | **Real** | Genuine Pareto filtering over four objectives |
-| Ward geometry | **Synthetic** | Seeded Voronoi lattice in real WGS84 coordinates |
-| Ward consumption, losses, reliability | **Synthetic** | Every grade-E variable |
-| Hydraulic network & pressures | **Synthetic** | Representative topology, *not* an EPANET solve |
-| Intervention effect sizes | **Synthetic** | The paper gives bands, not benefit figures |
+The prototype answers this by implementing the computational and decision-support mechanisms that can be demonstrated today while explicitly separating:
 
-**No Bengaluru water-system result is claimed anywhere in this application.**
-The ranking on the map is a demonstration of method. The header carries a
-permanent synthetic-share readout, every fabricated value is hatched or tagged,
-and the network page states in plain language that it is not a calibrated
-digital twin.
+- published/measured evidence;
+- paper-derived methodology;
+- synthetic demonstration data;
+- proposed future infrastructure; and
+- validated results.
+
+This distinction is fundamental to the credibility of the project.
 
 ---
 
-## Key features
+## 3. The problem in Bengaluru
 
-**Research story (`/`).** A 10-section presentation narrative — Problem → Research Concept →
-Water-Stress Index → Prediction → Digital Twin → 2030 Scenarios → Intervention Planning →
-Data Availability → Roadmap → Paper Traceability — built as the site's entry point for
-presenting the paper alongside the working prototype. Every section carries a status badge
-(**Real** / **Synthetic** / **Proposed** / **Validated**) stating precisely what kind of claim
-it's making, and embeds live figures computed from the same `lib/` functions the dashboards use,
-not a separate illustrative copy.
+City-wide supply figures can conceal neighbourhood-level vulnerability. A planning system therefore needs to reason spatially about:
 
-**Water-stress index that actually computes.** Min–max normalisation with
-direction reversal for service-quality indicators, entropy weights derived from
-the ward observation set, and per-indicator contribution breakdown. Switch
-between entropy and equal weighting and the whole map recomputes — including a
-Spearman rank-stability readout showing how far the priority order moved.
+- water demand and supply;
+- rainfall and groundwater conditions;
+- service reliability and losses;
+- population exposure and vulnerability;
+- hydraulic feasibility;
+- intervention cost;
+- equity; and
+- uncertainty in the underlying evidence.
 
-**Provenance tracing.** Click *"Why is this ward ranked 4th?"* and a drawer opens
-the full chain: the ranking, the index run and its hash, the weighting and
-normalisation steps, every indicator with its raw value, normalised value and
-applied weight, then each indicator's source and the audit limitation that
-governs it. The paper's Stage 6 gate reads *"users can trace recommendations to
-data and assumptions"* — this is that gate, implemented.
+The research found a major constraint: several operational variables required for a genuinely calibrated ward-level model are not publicly available at the necessary resolution.
 
-**Scenario comparison.** The four 2030 planning scenarios from the paper, each
-shifting demand, loss and supply multipliers through the index and the network.
-
-**Representative hydraulic layer.** A looped distribution topology with leak,
-pump-outage and supply-reduction perturbations, a minimum-pressure feasibility
-gate, and per-junction pressure profile.
-
-**Multi-objective intervention search.** 400 seeded portfolios evaluated against
-cost, residual stress, population protected and equity-weighted protection, then
-filtered by a real non-dominated sort. Budget and minimum-data-confidence act as
-live constraints. Objectives are never collapsed into a single ranking.
-
-**Data catalogue.** The Phase 2 audit rendered as an interactive table with
-expandable limitations, plus the full source list with each dataset's tier.
+Rather than manufacture a false "live Bengaluru model", this prototype makes that constraint visible throughout the application.
 
 ---
 
-## Screenshots
+## 4. What the prototype implements
 
-> Replace these placeholders after your first local run.
+### Research narrative — `/`
 
-| | |
-| --- | --- |
-| ![Water stress overview](docs/screenshots/stress.png) | ![Provenance trace](docs/screenshots/trace.png) |
-| **Water stress** — ward map, drivers, scenario controls | **Trace** — a ranking back to its sources |
-| ![Network](docs/screenshots/network.png) | ![Interventions](docs/screenshots/optimise.png) |
-| **Network** — representative zone under perturbation | **Interventions** — Pareto front with live budget |
+A presentation-oriented research story connecting the problem, methodology, data audit, modelling pipeline, 2030 scenarios, intervention planning and paper traceability.
+
+### Water-stress analysis — `/stress`
+
+- Ward-level prototype visualisation
+- Min–max normalisation
+- Direction reversal for stress-reducing indicators
+- Entropy weighting
+- Equal-weight comparison
+- Rank-stability analysis using Spearman correlation
+- Indicator contribution breakdown
+- Scenario-aware stress calculations
+
+### Provenance and traceability
+
+The application can trace a displayed ranking through:
+
+**result → analytical run → weights → indicators → source → availability grade → synthetic status**
+
+This implements the paper's emphasis on making recommendations traceable to data and assumptions.
+
+### Representative hydraulic network — `/network`
+
+A Level-2 representative network demonstrates:
+
+- looped topology;
+- supply-reduction perturbations;
+- leakage scenarios;
+- pump-outage scenarios;
+- pressure profiles; and
+- a minimum-pressure feasibility gate.
+
+It is explicitly **not a calibrated EPANET/WNTR model of Bengaluru**.
+
+### Intervention optimisation — `/optimise`
+
+The prototype evaluates seeded intervention portfolios against multiple objectives rather than collapsing everything into one arbitrary score:
+
+- intervention cost;
+- residual water stress;
+- population protected; and
+- equity-weighted protection.
+
+A non-dominated/Pareto filtering step identifies trade-off portfolios.
+
+### Data availability — `/data`
+
+The paper's Phase 2 data audit is represented as an interactive catalogue showing the availability grade, resolution, provenance and limitation of each variable.
 
 ---
 
-## Technology
+## 5. Data integrity and research honesty
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Framework | Next.js 15, App Router | Server components keep the lineage tree off the client bundle |
-| Language | TypeScript 5.8, `strict` | Grade and synthetic flags are enforced at compile time |
-| Styling | Tailwind CSS 4 | CSS-first `@theme` tokens, no config file to drift |
-| Charts & map | Hand-written SVG | No library defaults leaking into the visual system |
-| Geometry | Voronoi + Lloyd relaxation (Python) | Deterministic, reproducible, swappable for real GeoJSON |
+**This is the most important design principle in the repository.**
 
-**Runtime dependencies: `next`, `react`, `react-dom`. That is the whole list.**
-No chart library, no map library, no animation library. Every visual element is
-built in-repo, which is why the bar weights, tick styling and colour semantics
-stay consistent across the app.
+| Category | Meaning |
+|---|---|
+| **Real** | Published or measured evidence used by the research, including the rainfall record and data-availability findings |
+| **Synthetic** | Demonstration values generated because the required operational data is unavailable at the target resolution |
+| **Proposed methodology** | Methods specified by the research, such as WSI construction, entropy weighting, scenario design and multi-objective optimisation |
+| **Validated result** | A measured Bengaluru result supported by real observations and validation; **none is claimed by this prototype** |
 
-### Design system
+The UI communicates this distinction through:
 
-| Token | Hex | Meaning |
-| --- | --- | --- |
-| `paper` | `#F2F2EF` | Base surface |
-| `ink` | `#15181B` | Primary text |
-| `coral` | `#E2553B` | Water stress, alerts, selection |
-| `sage` | `#DDE7C1` | Adequate service |
-| `deep` | `#16323D` | The piped network |
+- synthetic-data tags;
+- hatching and visual treatment;
+- availability grades;
+- provenance drawers;
+- confidence indicators; and
+- explicit dashboard disclosures.
 
-Type is **Archivo** for display, **IBM Plex Sans** for body, **IBM Plex Mono**
-restricted to figures and axis ticks so numbers stay tabular down a column.
+### Non-negotiable rule
+
+> **Never present synthetic output as a real Bengaluru finding.**
+
+The representative network is not presented as a calibrated digital twin, synthetic ward indicators are not presented as measured utility data, and optimisation outputs are not presented as validated municipal recommendations.
 
 ---
 
-## Running locally
+## 6. Methodology
 
-**Requirements:** Node.js 18.18+ (20+ recommended).
+### Water-Stress Index
+
+The prototype implements a reproducible WSI pipeline:
+
+1. Indicator normalisation
+2. Direction reversal where higher values indicate lower stress
+3. Entropy-derived weighting
+4. Weighted aggregation
+5. Confidence propagation
+6. Rank-stability comparison under alternative weighting
+
+### Forecasting
+
+The frontend contains a baseline-vs-candidate forecasting workflow with chronological holdout validation and MAE/RMSE comparison. The architecture is designed so that production model training and persisted validation runs can move to the backend in the next phase.
+
+### Hydraulic simulation
+
+The paper defines a Level-2 hydraulic twin based on EPANET/WNTR. The current application implements a clearly labelled representative network layer for demonstration and interaction; it does **not** claim a calibrated hydraulic solve.
+
+### Multi-objective optimisation
+
+Intervention portfolios are evaluated independently across multiple objectives and filtered through non-dominated sorting. The future production architecture calls for NSGA-II with hydraulic verification before any portfolio is treated as decision-ready.
+
+---
+
+## 7. Four 2030 planning scenarios
+
+The prototype carries the research scenarios into an interactive planning interface:
+
+| Scenario | Planning interpretation |
+|---|---|
+| **A — Business as Usual** | Existing management trajectory continues |
+| **B — Supply Augmentation** | Verified supply additions improve system conditions |
+| **C — Predictive Intervention** | Forecast-driven targeting prioritises vulnerable areas |
+| **D — Integrated Water Resilience** | Supply, demand, losses and equity are addressed together |
+
+The scenario multipliers used by the prototype are **synthetic planning assumptions**. They are not forecasts of Bengaluru's actual 2030 operating conditions.
+
+---
+
+## 8. Architecture
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                    JalDrishti 2030                           │
+│          Research + Decision-Support Prototype               │
+└──────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┴────────────────┐
+              │                                │
+       Next.js / TypeScript              FastAPI Backend
+       Research Interface                 Health / API seam
+              │                                │
+       ┌──────┼────────┐                       │
+       │      │        │                       │
+     WSI   Forecast  Optimise              PostgreSQL /
+       │      │        │                   PostGIS (planned)
+       └──────┼────────┘                       │
+              │                                │
+        Provenance Layer                 Real Data Connectors
+              │                         (planned Phase 2+)
+              │
+       ┌──────┴──────────┐
+       │                 │
+  `/stress`         `/network`
+  Water stress      Hydraulic twin
+       │                 │
+       └────────┬────────┘
+                │
+          `/optimise`
+        Intervention search
+                │
+             `/data`
+       Availability & sources
+```
+
+The frontend/backend seam is intentionally narrow. The current FastAPI service provides health status; analytical routes are planned for the next implementation phase. The UI therefore remains honest about which numbers originate from local prototype fixtures.
+
+---
+
+## 9. Technology stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15.5.27, React, TypeScript 5.8 |
+| Styling | Tailwind CSS 4 |
+| Visualisation | Hand-written SVG charts and maps |
+| Backend | Python, FastAPI, Pydantic |
+| Database | PostgreSQL + PostGIS — planned for the full backend phase |
+| Hydraulic modelling | EPANET / WNTR — planned for calibrated simulation |
+| Optimisation | NSGA-II / pymoo — planned for production optimisation |
+| Deployment | Vercel for the current frontend deployment |
+| Testing | TypeScript checks, production build, backend pytest suite |
+
+The current frontend deliberately keeps runtime dependencies minimal and implements its visual language in-repo to maintain consistent scientific/provenance semantics.
+
+---
+
+## 10. Repository structure
+
+```text
+.
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Research narrative
+│   │   ├── stress/page.tsx       # Water-stress analysis
+│   │   ├── network/page.tsx      # Representative hydraulic network
+│   │   ├── optimise/page.tsx     # Intervention optimisation
+│   │   └── data/page.tsx         # Data availability audit
+│   ├── components/
+│   │   ├── shell/               # Application shell and navigation
+│   │   ├── map/                 # Ward visualisation
+│   │   ├── charts/              # Scientific visualisations
+│   │   ├── provenance/          # Traceability and evidence UI
+│   │   └── ui/                  # Shared primitives
+│   ├── data/                    # Prototype datasets and paper-derived definitions
+│   ├── lib/
+│   │   ├── wsi.ts               # WSI computation
+│   │   ├── forecast.ts           # Forecasting / validation logic
+│   │   ├── optimise.ts           # Pareto / optimisation logic
+│   │   ├── geo.ts                # Spatial projection helpers
+│   │   └── api.ts                # Backend integration seam
+│   └── types/                   # Domain types
+├── tools/                       # Deterministic prototype data generation
+├── docs/                        # Supporting project documentation
+├── backend (1)/backend/         # FastAPI backend foundation
+├── PROJECT_CONTEXT.md           # Research and implementation source of truth
+├── package.json
+└── README.md
+```
+
+---
+
+## 11. Research-to-software traceability
+
+| Research component | Prototype implementation |
+|---|---|
+| Sense → Decide cycle | Application route structure and stage labels |
+| Phase 2 data audit | `/data` + `src/data/catalogue.ts` |
+| Water-Stress Index | `src/lib/wsi.ts` + `/stress` |
+| Predictive modelling | `src/lib/forecast.ts` |
+| Level-2 hydraulic twin | `/network` |
+| Intervention library | `src/data/interventions.ts` |
+| Multi-objective optimisation | `src/lib/optimise.ts` + `/optimise` |
+| Equity-aware optimisation | Vulnerability/equity objective |
+| Uncertainty & sensitivity | Weighting comparison, rank stability, confidence |
+| 2030 scenarios | Scenario controls across stress/network views |
+| Governance & human review | Provenance UI and explicit non-autonomous positioning |
+
+The repository's `PROJECT_CONTEXT.md` provides the detailed mapping between the research methodology, implementation phases, domain terminology and current limitations.
+
+---
+
+## 12. Current status
+
+### Completed
+
+- [x] Research narrative and paper-aligned application shell
+- [x] Water-Stress Index computation
+- [x] Entropy/equal-weight comparison
+- [x] Rank-stability analysis
+- [x] Forecast baseline comparison
+- [x] Pareto/non-dominated portfolio filtering
+- [x] Provenance and traceability interface
+- [x] Data-availability audit interface
+- [x] Representative hydraulic network interface
+- [x] Four 2030 scenario controls
+- [x] FastAPI health integration
+- [x] Production Next.js build
+- [x] TypeScript typecheck
+- [x] Vercel deployment
+
+### In progress / future phases
+
+- [ ] Real public-data ingestion connectors
+- [ ] Persisted dataset and run provenance
+- [ ] PostgreSQL/PostGIS backend
+- [ ] Server-side WSI computation
+- [ ] Production forecasting/model registry
+- [ ] Calibrated EPANET/WNTR hydraulic simulation
+- [ ] NSGA-II optimisation with hydraulic verification
+- [ ] Role-based decision workflow and audit log
+
+---
+
+## 13. Running locally
+
+### Prerequisites
+
+- Node.js 18.18+; Node.js 20+ recommended
+- Python 3.12+ for backend development
+
+### Frontend
 
 ```bash
-git clone https://github.com/<you>/jaldrishti-web.git
-cd jaldrishti-web
+git clone https://github.com/Jyatin/Repository-name-JalDrishti-2030.git
+cd Repository-name-JalDrishti-2030
 npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>.
+Open `http://localhost:3000`.
 
-To check the backend health endpoint, set `NEXT_PUBLIC_API_URL` to the API base
-URL including its version prefix (for local development:
-`http://localhost:8000/api/v1`). The header reports connection and database
-status. It continues to label analytical content as prototype data because no
-analytical data routes are implemented yet. The older
-`NEXT_PUBLIC_API_BASE_URL` variable remains accepted as a compatibility alias.
-Next.js inlines public environment variables into the client bundle, so set the
-production API URL before `npm run build` and rebuild if it changes.
+### Verification
 
 ```bash
-npm run build       # production build
-npm run typecheck   # tsc --noEmit
-npm run lint
+npm run typecheck
+npm run build
 ```
 
-### Regenerating the ward lattice
+The frontend accepts `NEXT_PUBLIC_API_URL` as the backend base URL, including `/api/v1`. The legacy `NEXT_PUBLIC_API_BASE_URL` variable remains supported for compatibility.
 
-Requires Python with `numpy` and `scipy`:
-
-```bash
-python3 tools/gen_wards.py > wards.json
-```
-
-Change `SEED` or `N_WARDS` at the top of the script for a different lattice.
-See `tools/README.md` for wiring the output back into `src/data/wards.ts`.
+> Public Next.js environment variables are inlined at build time. Set production values before building the deployment.
 
 ---
 
-## Project structure
+## 14. Deployment
 
-```
-src/
-├─ app/
-│  ├─ page.tsx              Research story — home, 10-section presentation narrative
-│  ├─ stress/page.tsx       Water stress — map, drivers, scenarios
-│  ├─ network/page.tsx      Level 2 representative network
-│  ├─ optimise/page.tsx     Pareto explorer, intervention library
-│  ├─ data/page.tsx         Availability audit and source catalogue
-│  ├─ layout.tsx            Fonts and metadata
-│  └─ globals.css           Design tokens, motion, hatching
-│
-├─ components/
-│  ├─ shell/                Icon rail, header with synthetic readout
-│  ├─ map/                  SVG choropleth, hover card, legend
-│  ├─ panels/               Ward detail column
-│  ├─ charts/               Sparkbars, forecast band, Pareto, pressure
-│  ├─ provenance/           Grade chips, synthetic tags, trace drawer
-│  └─ ui/                   Panel, CountUp, Tooltip
-│
-├─ lib/
-│  ├─ wsi.ts                Normalisation, entropy weighting, rank stability
-│  ├─ forecast.ts           Baseline vs candidate, chronological validation
-│  ├─ optimise.ts           Portfolio generation, non-dominated sort, equity
-│  ├─ geo.ts                WGS84 → SVG projection
-│  ├─ format.ts             Display units in one place
-│  └─ api.ts                The seam where the backend plugs in
-│
-├─ data/                    Fixtures — replaceable without touching the UI
-│  ├─ wards.ts              Generated lattice + indicators
-│  ├─ catalogue.ts          Indicators, audit, sources, rainfall record
-│  └─ interventions.ts      Library, scenarios, network topology
-│
-└─ types/index.ts           Domain types mirroring the paper
-```
+The current research prototype is deployed on Vercel:
 
-### Separation of data and UI
+**https://repository-name-jal-drishti-2030-9o.vercel.app**
 
-No component computes a domain value inline. Pages read fixtures, hand them to
-`src/lib`, and render the result. `src/lib/api.ts` already declares the return
-shape of every backend endpoint, so wiring the real service is a mechanical pass
-over four files rather than a rewrite.
+The production frontend is built from the repository root using the standard Next.js build pipeline.
+
+The backend is currently a foundation service whose implemented API surface is limited to health/status functionality. The frontend therefore does not imply that analytical values have become live simply because the API is reachable.
 
 ---
 
-## Roadmap
+## 15. Research limitations
 
-**Phase 1 — Frontend prototype** ✅ *this repository*
+The following limitations are intentional and documented rather than hidden:
 
-**Phase 2 — Backend foundation**
-FastAPI service, PostgreSQL + PostGIS, provenance and dataset-version tables,
-ingestion connectors for the genuinely public sources.
+1. Several operational water variables are unavailable publicly at the resolution required for the proposed Bengaluru model.
+2. Ward-level consumption, losses and service-reliability values used in the prototype are synthetic.
+3. The ward geometry is a deterministic prototype lattice, not an official municipal boundary dataset.
+4. The hydraulic network is representative and uncalibrated.
+5. Intervention effect sizes and some planning coefficients are prototype assumptions derived from the research design rather than measured outcomes.
+6. No citywide intervention recommendation is claimed as a validated Bengaluru result.
 
-**Phase 3 — Real analytics**
-Server-side WSI with persisted runs, forecasting with a model registry and
-rolling-origin validation, per-ward error analysis.
-
-**Phase 4 — Real hydraulics**
-EPANET/WNTR via a job queue, extended-period simulation, Parquet result storage.
-The `is_calibrated` flag stays `false` until field pressure and flow data exist.
-
-**Phase 5 — Real optimisation**
-NSGA-II via pymoo, hydraulic response caching, full re-simulation of leading
-solutions before anything is recommended.
-
-**Phase 6 — Decision workflow**
-Role-based views, accept/reject with reviewer notes, audit log. Planning
-analytics stay separated from operational control — permanently.
+These constraints define the boundary between **research methodology** and **empirical validation**.
 
 ---
 
-## Connection to the research
+## 16. Research integrity
 
-| Paper section | Where it lives |
-| --- | --- |
-| §4.1 Sense → Decide cycle | Route structure and the rail's stage labels |
-| §4.3 Phase 2 audit (Table 3) | `data/catalogue.ts`, `/data` |
-| §4.4 Water-Stress Index | `lib/wsi.ts` |
-| §4.5 Predictive modelling | `lib/forecast.ts` |
-| §4.7 Level 2 hydraulic twin | `/network`, labelled uncalibrated |
-| §4.9 Intervention library (Table 4) | `data/interventions.ts` |
-| §4.10 Multi-objective optimisation | `lib/optimise.ts` |
-| §4.11 Equity-aware optimisation | `vulnerability()` and the equity objective |
-| §4.12 Uncertainty and sensitivity | Weighting switch, rank stability, forecast bands |
-| §4.13 2030 scenarios (Table 5) | Scenario switch on stress and network views |
-| §6.5 Governance and privacy | No autonomous control; stated in the trace drawer |
+JalDrishti is intentionally designed to make uncertainty visible.
+
+> **A precise-looking synthetic number is more dangerous than an obvious missing number.**
+
+For that reason, the application prioritises provenance, data grades, synthetic-share indicators and explicit status labels. Any future backend implementation must preserve these guarantees.
 
 ---
 
-## Contributing
+## 17. Acknowledgements
 
-Issues and pull requests are welcome, particularly on hydraulic modelling,
-municipal data engineering and accessibility.
+**Research supervision:** Dr. Parveen Kumar, Mittal School of Business, Lovely Professional University.  
+**Author:** Jyatin Kumar Singh, B.Tech Computer Science and Engineering, Lovely Professional University.  
+**Research context:** BRICS SMART CITY 2030 — Category 3, Smart-City Technologies and Services.
 
-One rule overrides everything else:
-
-> **Never present synthetic output as a real Bengaluru result.**
-
-If a change causes a fabricated value to appear without its grade, hatch or
-synthetic tag, that is a bug of the most serious kind in this project — more
-serious than a crash, because a crash cannot mislead a planner.
-
-Before opening a PR: `npm run typecheck && npm run lint && npm run build`.
+Public-data and research sources are documented within the project data catalogue and research manuscript.
 
 ---
-
-## Acknowledgements
-
-Research supervised by **Dr. Parveen Kumar**, Mittal School of Business, Lovely
-Professional University. Public data via IMD, KSNDMC, CGWB and OpenCity.
-
-Author: **Jyatin Kumar Singh**, B.Tech Computer Science and Engineering, Lovely
-Professional University.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [`LICENSE`](LICENSE).
 
-The MIT licence covers the source code. It does not extend to the underlying
-public datasets, which remain under their publishers' terms.
+The MIT license covers the source code. Underlying datasets and third-party materials remain subject to their respective publishers' terms.
+
+---
+
+### Links
+
+- **Live application:** https://repository-name-jal-drishti-2030-9o.vercel.app
+- **GitHub:** https://github.com/Jyatin/Repository-name-JalDrishti-2030
+- **Project context:** [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md)
+- **Research paper title:** *JalDrishti 2030: An IoT–AI Digital Twin for Predictive Water-Stress and Intervention Planning in Bengaluru*
