@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/*
+ * JalDrishti design tokens.
+ *
+ * Palette lifted from the reference dashboard: a cool off-white base, near-black
+ * ink, and three signal colours — coral for stress, sage for secure, deep teal
+ * for the network. Each carries meaning here rather than decoration:
+ * coral = water stress, sage = adequate service, deep teal = the piped system.
+ */
+@theme {
+  --color-paper: #f2f2ef;
+  --color-panel: #fbfbf9;
+  --color-panel-2: #f7f7f4;
+  --color-ink: #15181b;
+  --color-ink-2: #5c6165;
+  --color-ink-3: #8b8f93;
+  --color-hairline: #e1e1dc;
+  --color-hairline-2: #d3d3cc;
+
+  --color-coral: #e2553b;
+  --color-coral-soft: #f3cfc5;
+  --color-sage: #dde7c1;
+  --color-sage-deep: #8ca05c;
+  --color-deep: #16323d;
+  --color-deep-2: #1e4553;
+
+  /* Water-stress ramp: secure -> critical. */
+  --color-stress-1: #dde7c1;
+  --color-stress-2: #ecebba;
+  --color-stress-3: #f0d5a4;
+  --color-stress-4: #e9a684;
+  --color-stress-5: #e2553b;
+
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-panel: 10px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Display face: tight leading and tracking at large sizes, per the reference. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.04;
+  }
+
+  /* Tabular figures everywhere a number is compared against another number. */
+  .figure {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-coral);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: var(--color-coral);
+    color: #fff;
+  }
+}
+
+@layer components {
+  /* Panels: hairline first, shadow only where a surface genuinely floats. */
+  .panel {
+    background: var(--color-panel);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-panel);
+  }
+
+  .panel-float {
+    box-shadow:
+      0 1px 2px rgb(21 24 27 / 0.04),
+      0 8px 24px -12px rgb(21 24 27 / 0.16);
+  }
+
+  .hair-t {
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .hair-b {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+}
+
+/*
+ * Synthetic-data hatching.
+ *
+ * The one piece of visual language the platform is built around: anything drawn
+ * with this pattern is fabricated. Opacity scales with synthetic share.
+ */
+.hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(21 24 27 / 0.16) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+/* Map interaction */
+.ward-cell {
+  transition:
+    fill 180ms cubic-bezier(0.32, 0.72, 0, 1),
+    stroke-width 140ms ease,
+    opacity 160ms ease;
+  cursor: pointer;
+}
+
+.ward-cell:hover {
+  stroke-width: 1.6;
+}
+
+/* Marquee around the active ward, matching the reference's dashed selection. */
+@keyframes marquee-in {
+  from {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.marquee {
+  animation: marquee-in 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: center;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* One orchestrated page-load reveal, staggered by panel — not per element. */
+.reveal {
+  animation: rise 420ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--draw-length, 400);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bar-grow {
+  transform-origin: bottom;
+  animation: grow 520ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Scrollbars inside panels stay quiet. */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline-2) transparent;
+}
+
+.thin-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-hairline-2);
+  border-radius: 4px;
+}
+
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
