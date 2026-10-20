@@ -1,106 +1,115 @@
-# JalDrishti 2030 — Backend
+# JalDrishti 2030 — API
 
-Analytical backend for JalDrishti 2030. **Phase 2A**: FastAPI application skeleton,
-full PostgreSQL + PostGIS schema, health check. No business logic yet — see
-[Phase roadmap](#phase-roadmap).
+FastAPI foundation for JalDrishti 2030. This service currently exposes health/status functionality and includes a PostgreSQL + PostGIS schema foundation. Analytical endpoints for WSI, forecasting, data ingestion and hydraulic analysis are future work.
 
-The frontend (`jaldrishti-web/`) checks this service's health endpoint. It
-continues to use explicitly labelled local fixtures for analytical content;
-this backend does not yet provide those data or computation routes. See the
-frontend's `PROJECT_CONTEXT.md` for the paper-to-implementation crosswalk.
+The frontend uses this service for backend health visibility. Analytical screens still use explicitly labelled local prototype fixtures; a healthy API response does not mean the displayed values are live or validated.
 
-## Quickstart
+## API endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /` | Service identity and API documentation path |
+| `GET /api/v1/health` | Health/status check |
+| `/api/v1/docs` | Interactive OpenAPI documentation |
+
+## Run with Docker Compose
+
+Run these commands from this directory:
 
 ```bash
 cp .env.example .env
-# Set DATABASE_URL, POSTGRES_USER, POSTGRES_PASSWORD and POSTGRES_DB in .env.
-# For Docker Compose, DATABASE_URL should point to host "db".
+```
+
+Set the following values in `.env` before starting the stack:
+
+```dotenv
+PROJECT_NAME=JalDrishti 2030 API
+ENVIRONMENT=local
+API_V1_PREFIX=/api/v1
+POSTGRES_USER=jaldrishti
+POSTGRES_PASSWORD=change-this-local-password
+POSTGRES_DB=jaldrishti
+DATABASE_URL=postgresql+psycopg://jaldrishti:change-this-local-password@db:5432/jaldrishti
+CORS_ORIGINS=http://localhost:3000
+LOG_LEVEL=INFO
+```
+
+Use a URL-encoded password if it contains reserved characters. Keep real credentials out of Git.
+
+Start the API and database:
+
+```bash
 docker compose up --build
 ```
 
-This starts Postgres+PostGIS, applies migrations, and serves the API at
-`http://localhost:8000`. Interactive docs: `http://localhost:8000/api/v1/docs`.
-Local CORS allows `http://localhost:3000`. Set `CORS_ORIGINS` in the deployment
-environment to the exact frontend origin or comma-separated list of origins;
-the setting is not restricted to localhost.
+The API listens on `http://localhost:8000`. OpenAPI docs are at `http://localhost:8000/api/v1/docs`; health should respond at `http://localhost:8000/api/v1/health`.
 
-Without Docker:
+## Run without Docker
+
+You need Python 3.12+ and a PostgreSQL instance with PostGIS support.
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# macOS/Linux:
+# source .venv/bin/activate
+
 pip install -r requirements-dev.txt
-# point DATABASE_URL in .env at a real Postgres+PostGIS instance
-alembic upgrade head
-uvicorn app.main:app --reload
 ```
+
+Set `DATABASE_URL` in your local `.env` to the database URL for your instance, then run:
 
 ```bash
-make test    # pytest
-make lint    # ruff
+alembic upgrade head
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-## Schema decisions worth knowing before you extend this
+## Environment variables
 
-**One `observation` table, not one per variable type.** The brief that started
-this phase listed consumption, groundwater, rainfall, supply, and loss as
-separate schema items. They're implemented as rows in one generic
-`observation` fact table, distinguished by `variable_id` (which itself carries
-a `category`). Adding a new indicator is one new `variable_definition` row —
-not a migration. See `app/models/observation.py`.
+| Variable | Purpose |
+|---|---|
+| `PROJECT_NAME` | API service name |
+| `ENVIRONMENT` | Environment label, such as `local` or `production` |
+| `API_V1_PREFIX` | Versioned API prefix; defaults to `/api/v1` |
+| `DATABASE_URL` | SQLAlchemy connection URL using the psycopg driver |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Docker Compose database initialisation |
+| `CORS_ORIGINS` | Comma-separated exact allowed browser origins |
+| `LOG_LEVEL` | Logging level |
 
-**Enums are `VARCHAR` + `CHECK`, not native Postgres `ENUM` types.** Adding a
-new grade or status value is a one-line constraint edit. Native `ENUM` types
-require `ALTER TYPE ... ADD VALUE` and can't run inside a transaction in older
-Postgres — not worth the ceremony for a schema that's still moving.
+For a deployed frontend, set `CORS_ORIGINS` to the exact deployed frontend origin, with no path suffix. Include additional origins only when required. Do not use a wildcard origin with credentialed requests.
 
-**`is_synthetic` on `dataset_version` has no default.** Every write must
-declare what it is. This is the database-level version of the frontend's
-`SyntheticTag`/`GradeChip` system — same rule, enforced one layer lower.
+## Tests and lint
 
-**UUID primary keys, Python-side defaults.** `default=uuid.uuid4` runs in the
-ORM, not the database, so the initial migration doesn't need
-`gen_random_uuid()` server defaults. `pgcrypto` is still enabled for future use.
+```bash
+make test
+make lint
+```
 
-**The initial migration is hand-written, not autogenerated.** There was no
-live database at authoring time to diff against. It's verified column-for-column
-against `app/models/` (see the repo's build history), but treat it as the
-baseline to diff against, not as a permanent pattern — every migration after
-this one should come from `alembic revision --autogenerate`.
+## Schema notes
 
-## What Phase 2A does NOT include
+- Observations for consumption, groundwater, rainfall, supply and losses share a generic observation model and are distinguished by variable definitions.
+- Enumerated status and grade values use `VARCHAR` columns with database `CHECK` constraints to make schema evolution manageable.
+- Dataset versions require an explicit `is_synthetic` value so data provenance is not silently assumed.
+- The initial Alembic migration was authored as a baseline and should be treated as the reference for subsequent schema changes.
 
-- No data in any table — schema only
-- No WSI/forecast computation — `app/lib`-equivalent services don't exist yet
-- No routes beyond `/api/v1/health` — the models are ready for `/wsi`, `/forecast`
-  etc., but routing them before the logic exists would be exactly the kind of
-  overclaiming the project's honesty rules exist to prevent
-- Frontend analytical screens still run entirely on local fixtures; the frontend
-  uses `/api/v1/health` only to report backend connectivity
-
-## Phase roadmap
+## Current scope and roadmap
 
 | Phase | Scope | Status |
 |---|---|---|
-| 2A | FastAPI skeleton, full schema, health check | **This delivery** |
-| 2B | Data ingestion connectors + provenance population | Not started |
-| 2C | WSI engine — port `frontend/src/lib/wsi.ts` into a service that writes `wsi_run`/`wsi_score` | Not started |
-| 2D | Forecasting engine — port `frontend/src/lib/forecast.ts` similarly | Not started |
-| 2E | Frontend integration — replace fixture calls only as matching backend routes and services become available | Health check connected; analytical data integration pending |
-| 3 | EPANET/WNTR, NSGA-II via pymoo, hydraulic verification | Explicitly deferred — do not start early |
+| 2A | FastAPI skeleton, database schema, migrations and health check | Implemented foundation |
+| 2B | Data-ingestion connectors and provenance population | Planned |
+| 2C | Server-side WSI service and persisted analytical runs | Planned |
+| 2D | Forecasting service and validation/model registry | Planned |
+| 2E | Frontend integration with implemented analytical endpoints | Pending; health integration only |
+| 3 | EPANET/WNTR simulation, NSGA-II optimisation and human-review workflow | Planned |
 
-## Project structure
+## Deployment notes
 
-```
-app/
-├─ main.py              FastAPI app, CORS, router mount
-├─ core/
-│  ├─ config.py         Settings — all env vars, one place
-│  └─ database.py       Engine, session, Base, get_db()
-├─ api/v1/
-│  ├─ router.py         Aggregates endpoint routers
-│  └─ endpoints/health.py
-├─ models/               18 tables across provenance / spatial / observation / wsi / forecast / intervention
-└─ schemas/              Pydantic request/response models
-alembic/                 Migrations — env.py wired to Settings.DATABASE_URL + app.models
-tests/
-```
+For a Docker-based host, configure the service's root directory as this backend folder, build using the included `Dockerfile`, and expose port `8000`. Set `DATABASE_URL` to the production database address, not `localhost` or the Compose hostname `db`. Configure the database, migrations and network access according to the chosen hosting provider.
+
+Set `CORS_ORIGINS` to the real frontend origin before deployment. The backend is separate from the Vercel frontend: a successful frontend deployment does not prove the API is healthy, and vice versa. Inspect the backend host's build/runtime logs for the exact cause of any failed deployment.
+
+## Research integrity
+
+Do not treat synthetic frontend fixtures or the illustrative network as measured Bengaluru operational data. No calibrated citywide hydraulic result or validated citywide intervention recommendation is claimed by this phase.
