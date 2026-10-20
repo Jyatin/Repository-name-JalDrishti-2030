@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "gen:wards": "python3 tools/gen_wards.py > /tmp/wards.json && echo 'see tools/README.md'"
   },
@@ -21,9 +21,6 @@
     "@types/node": "22.15.3",
     "@types/react": "19.1.10",
     "@types/react-dom": "19.1.7",
-    "@eslint/eslintrc": "^3.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "15.5.27",
     "tailwindcss": "4.1.13",
     "typescript": "5.8.3"
   }
