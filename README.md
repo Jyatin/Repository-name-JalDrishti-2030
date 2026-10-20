@@ -12,7 +12,7 @@
 [![Status](https://img.shields.io/badge/Status-Research_Prototype-16323D?style=flat-square)](#current-status)
 [![Data Integrity](https://img.shields.io/badge/Data-Synthetic%2FProvenance--Aware-8B8F93?style=flat-square)](#data-integrity-and-research-honesty)
 
-**Live application:** https://repository-name-jal-drishti-2030-9o.vercel.app  
+**Live application:** [Open JalDrishti 2030](https://repository-name-jal-drishti-2030-9o.vercel.app)  
 **Repository:** https://github.com/Jyatin/Repository-name-JalDrishti-2030  
 **Research manuscript:** *JalDrishti 2030: An IoT–AI Digital Twin for Predictive Water-Stress and Intervention Planning in Bengaluru*  
 **Competition:** III International Competition of Student and Young Researcher Projects — **SMART CITY 2030**, Category 3: Smart-City Technologies and Services  
