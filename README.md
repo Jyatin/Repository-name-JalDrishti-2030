@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://repository-name-jaldrishti-2030.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-Open%20Application-E2553B?style=for-the-badge" alt="Open live demo" /></a>
+  <a href="https://repository-name-jal-drishti-2030-9o.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-Open%20Application-E2553B?style=for-the-badge" alt="Open live demo" /></a>
   <img src="https://img.shields.io/badge/Next.js-15.5.27-111111?style=for-the-badge&logo=next.js" alt="Next.js 15.5.27" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript 5.8" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind CSS 4" />
@@ -37,7 +37,7 @@ Its planning cycle is:
 
 ### Open the application
 
-**[Launch JalDrishti 2030](https://repository-name-jaldrishti-2030.vercel.app)** · [View the source code](https://github.com/Jyatin/Repository-name-JalDrishti-2030) · [Read the implementation context](PROJECT_CONTEXT.md)
+**[Launch JalDrishti 2030](https://repository-name-jal-drishti-2030-9o.vercel.app)** · [View the source code](https://github.com/Jyatin/Repository-name-JalDrishti-2030) · [Read the implementation context](PROJECT_CONTEXT.md)
 
 The live demo URL above is the frontend URL currently referenced by this repository. Deployment aliases and project names are managed by Vercel; see [Deployment troubleshooting](#deployment-troubleshooting) before treating a failed deployment entry as a failed application.
 
@@ -175,7 +175,7 @@ The backend source is in [`backend (1)/backend`](backend%20(1)/backend/README.md
 
 ## Deployment
 
-- **Frontend application:** [Open JalDrishti 2030](https://repository-name-jaldrishti-2030.vercel.app)
+- **Frontend application:** [Open JalDrishti 2030](https://repository-name-jal-drishti-2030-9o.vercel.app)
 - **GitHub deployments:** [View deployment records](https://github.com/Jyatin/Repository-name-JalDrishti-2030/deployments)
 - **Backend source and setup:** [Backend README](backend%20(1)/backend/README.md)
 
